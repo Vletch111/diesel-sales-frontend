@@ -1,0 +1,28 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Diesel Sales Frontend</title>
+  </head>
+  <body>
+    <h1>🚛 Diesel Sales CRM</h1>
+    <h2 id="status">Checking backend...</h2>
+    <button onclick="checkBackend()">Check Backend</button>
+
+    <script>
+      const API_URL = "https://diesel-sales-backend.onrender.com"; // Change to your backend URL
+
+      async function checkBackend() {
+        try {
+          const response = await fetch(`${API_URL}/health`);
+          const data = await response.json();
+          document.getElementById('status').innerText = `Backend Status: ${data.status}`;
+        } catch (error) {
+          document.getElementById('status').innerText = 'Error: Cannot reach backend';
+        }
+      }
+
+      checkBackend();
+    </script>
+  </body>
+</html>
