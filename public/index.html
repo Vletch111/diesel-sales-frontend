@@ -1,28 +1,166 @@
-<!-- index.html -->
+<!-- public/index.html - Diesel Sales Dashboard (Final) -->
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Diesel Sales Frontend</title>
+    <title>Diesel Sales CRM Dashboard</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+      h1 { color: #2c3e50; }
+      h2, h3 { color: #34495e; }
+      button { padding: 10px 20px; margin: 10px; font-size: 14px; cursor: pointer; }
+      table { border-collapse: collapse; margin: 20px auto; width: 90%; }
+      th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+      th { background-color: #2c3e50; color: white; }
+      .error { color: red; }
+      .success { color: green; }
+      .stats-box { border: 2px solid #2c3e50; padding: 10px; margin: 20px; }
+      .highlight { background-color: #e1f5fe; font-weight: bold; }
+    </style>
   </head>
   <body>
-    <h1>🚛 Diesel Sales CRM</h1>
+    <h1>🚛 Diesel Sales CRM Dashboard</h1>
     <h2 id="status">Checking backend...</h2>
-    <button onclick="checkBackend()">Check Backend</button>
+
+    <!-- Buttons -->
+    <button onclick="fetchClients()">📞 Show Clients</button>
+    <button onclick="fetchOrders()">📦 Show Orders</button>
+    <button onclick="fetchStats()">📊 Show Monthly Stats</button>
+
+    <!-- Stats Section -->
+    <h3>📊 Monthly Sales Statistics</h3>
+    <div id="stats" class="stats-box"></div>
+
+    <!-- Clients Table -->
+    <h3>🧑‍🤝‍🧑 Client List</h3>
+    <table id="clientsTable">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Monthly Volume (Litres)</th>
+        <th>Province</th>
+        <th>Frequency</th>
+        <th>Delivery Type</th>
+      </tr>
+    </table>
+
+    <!-- Orders Table -->
+    <h3>📦 Order List</h3>
+    <table id="ordersTable">
+      <tr>
+        <th>Order ID</th>
+        <th>Client ID</th>
+        <th>Supplier</th>
+        <th>Litres</th>
+        <th>Truckloads</th>
+        <th>Status</th>
+      </tr>
+    </table>
 
     <script>
-      const API_URL = "https://diesel-sales-backend.onrender.com"; // Correct backend URL
+      const API_URL = "https://diesel-sales-backend.onrender.com"; // Backend URL
 
+      // Check Backend Status
       async function checkBackend() {
+        const statusElement = document.getElementById('status');
         try {
           const response = await fetch(`${API_URL}/health`);
           const data = await response.json();
-          document.getElementById('status').innerText = `Backend Status: ${data.status}`;
+          if (data.status === 'healthy') {
+            statusElement.innerText = 'Backend Status: healthy';
+            statusElement.className = 'success';
+          } else {
+            statusElement.innerText = 'Backend Status: error';
+            statusElement.className = 'error';
+          }
         } catch (error) {
-          document.getElementById('status').innerText = 'Error: Cannot reach backend';
+          statusElement.innerText = 'Error: Cannot connect to backend';
+          statusElement.className = 'error';
         }
       }
 
-      checkBackend();
+      // Fetch and Display Clients
+      async function fetchClients() {
+        const clientsTable = document.getElementById('clientsTable');
+        clientsTable.innerHTML = `
+          <tr class="highlight">
+            <th>ID</th>
+            <th>Name</th>
+            <th>Monthly Volume (Litres)</th>
+            <th>Province</th>
+            <th>Frequency</th>
+            <th>Delivery Type</th>
+          </tr>`;
+        try {
+          const response = await fetch(`${API_URL}/clients`);
+          const clients = await response.json();
+          clients.forEach(client => {
+            clientsTable.innerHTML += `
+              <tr>
+                <td>${client.id}</td>
+                <td>${client.name}</td>
+                <td>${client.monthly_volume}</td>
+                <td>${client.province}</td>
+                <td>${client.frequency}</td>
+                <td>${client.delivery_type}</td>
+              </tr>`;
+          });
+        } catch (error) {
+          alert('Error loading clients');
+        }
+      }
+
+      // Fetch and Display Orders
+      async function fetchOrders() {
+        const ordersTable = document.getElementById('ordersTable');
+        ordersTable.innerHTML = `
+          <tr class="highlight">
+            <th>Order ID</th>
+            <th>Client ID</th>
+            <th>Supplier</th>
+            <th>Litres</th>
+            <th>Truckloads</th>
+            <th>Status</th>
+          </tr>`;
+        try {
+          const response = await fetch(`${API_URL}/orders`);
+          const orders = await response.json();
+          orders.forEach(order => {
+            ordersTable.innerHTML += `
+              <tr>
+                <td>${order.id}</td>
+                <td>${order.client_id}</td>
+                <td>${order.supplier}</td>
+                <td>${order.litres}</td>
+                <td>${order.truckloads}</td>
+                <td>${order.status}</td>
+              </tr>`;
+          });
+        } catch (error) {
+          alert('Error loading orders');
+        }
+      }
+
+      // Fetch and Display Monthly Stats
+      async function fetchStats() {
+        const statsDiv = document.getElementById('stats');
+        try {
+          const response = await fetch(`${API_URL}/stats`);
+          const stats = await response.json();
+          statsDiv.innerHTML = `
+            <p>Total Clients: ${stats.total_clients}</p>
+            <p>Total Orders: ${stats.total_orders}</p>
+            <p>Total Litres Sold: ${stats.total_litres_sold}</p>
+            <p>Total Truckloads Delivered: ${stats.total_truckloads}</p>
+            <p>Total Commission Earned: ${stats.total_commission}</p>
+            <p>Sales Pipeline by Province: ${JSON.stringify(stats.sales_pipeline)}</p>
+          `;
+        } catch (error) {
+          statsDiv.innerHTML = `<p class="error">Error loading statistics</p>`;
+        }
+      }
+
+      // Check backend health on page load
+      window.onload = checkBackend;
     </script>
   </body>
 </html>
