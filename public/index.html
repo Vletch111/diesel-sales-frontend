@@ -1,45 +1,28 @@
-<!-- public/index.html -->
+<!-- index.html -->
 <!DOCTYPE html>
 <html>
   <head>
     <title>Diesel Sales Frontend</title>
-    <style>
-      body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-      h1 { color: #2c3e50; }
-      p { color: #34495e; font-size: 18px; }
-      button { padding: 10px 20px; margin-top: 20px; font-size: 16px; }
-    </style>
   </head>
   <body>
     <h1>🚛 Diesel Sales CRM</h1>
-    <h2 id="status">Connecting to backend...</h2>
+    <h2 id="status">Checking backend...</h2>
     <button onclick="checkBackend()">Check Backend</button>
 
     <script>
-      // Set your backend URL (use the Render URL)
       const API_URL = "https://diesel-sales-backend.onrender.com"; // Correct backend URL
-      
-      // Function to check backend health
+
       async function checkBackend() {
-        const statusElement = document.getElementById('status');
         try {
           const response = await fetch(`${API_URL}/health`);
-          if (response.ok) {
-            const data = await response.json();
-            statusElement.innerText = `Backend Status: ${data.status}`;
-            statusElement.style.color = 'green';
-          } else {
-            statusElement.innerText = 'Backend error. Check backend deployment.';
-            statusElement.style.color = 'orange';
-          }
+          const data = await response.json();
+          document.getElementById('status').innerText = `Backend Status: ${data.status}`;
         } catch (error) {
-          statusElement.innerText = 'Error: Cannot connect to backend';
-          statusElement.style.color = 'red';
+          document.getElementById('status').innerText = 'Error: Cannot reach backend';
         }
       }
 
-      // Automatically check backend on page load
-      window.onload = checkBackend;
+      checkBackend();
     </script>
   </body>
 </html>
