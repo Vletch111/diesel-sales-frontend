@@ -3,9 +3,43 @@
 <html>
   <head>
     <title>Diesel Sales Frontend</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+      h1 { color: #2c3e50; }
+      p { color: #34495e; font-size: 18px; }
+      button { padding: 10px 20px; margin-top: 20px; font-size: 16px; }
+    </style>
   </head>
   <body>
     <h1>🚛 Diesel Sales CRM</h1>
-    <p>This is a placeholder page.</p>
+    <h2 id="status">Connecting to backend...</h2>
+    <button onclick="checkBackend()">Check Backend</button>
+
+    <script>
+      // Set your backend URL (use the Render URL)
+      const API_URL = "https://diesel-sales-backend.onrender.com"; // Change to your actual backend URL
+
+      // Function to check backend health
+      async function checkBackend() {
+        const statusElement = document.getElementById('status');
+        try {
+          const response = await fetch(`${API_URL}/health`);
+          if (response.ok) {
+            const data = await response.json();
+            statusElement.innerText = `Backend Status: ${data.status}`;
+            statusElement.style.color = 'green';
+          } else {
+            statusElement.innerText = 'Backend error. Check backend deployment.';
+            statusElement.style.color = 'orange';
+          }
+        } catch (error) {
+          statusElement.innerText = 'Error: Cannot connect to backend';
+          statusElement.style.color = 'red';
+        }
+      }
+
+      // Automatically check backend on page load
+      window.onload = checkBackend;
+    </script>
   </body>
 </html>
